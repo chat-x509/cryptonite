@@ -29,16 +29,12 @@
 
 #define REPORT_DIR "build/tmp/pkiExample"
 
-/* Криптопровайдер. */
-
 #include "stacktrace.h"
 
-/* PKIX. */
 #include "pkix_utils.h"
 #include "oids.h"
 #include "rs.h"
 
-/* Движки PKI. */
 #include "crypto_cache.h"
 #include "cert_engine.h"
 #include "certificate_request_engine.h"
@@ -72,9 +68,6 @@
 #include "enveloped_data.h"
 #include "pkcs12.h"
 
-
-/* -------------------- Обработка ошибок ------------------- */
-
 #define EXECUTE(func)                                                    \
     {                                                                    \
         int _error_code = (func);                                        \
@@ -101,11 +94,7 @@
 
 #define GET_ARR_CNT(x) (sizeof(x) / sizeof(x[0]))
 
-/* -------------------- Счетчик ошибок --------------------- */
-
 static int error_count = 0;
-
-/* ---------- Тестовые криптографические параметры --------- */
 
 #define PRNG_SEED_SIZE 128
 #define SERIAL_LEN 20
@@ -179,8 +168,6 @@ void error_print(const ErrorCtx *ctx)
 
 static int dstu_params_count = sizeof(dstu_params_id_map) / sizeof(Dstu4145ParamsId);
 
-/* --------------------- Ввод / вывод ---------------------- */
-
 static int tprintf(const char *fmt, ...)
 {
     va_list argp;
@@ -194,7 +181,6 @@ static int tprintf(const char *fmt, ...)
     return ret;
 }
 
-/** Converts from POSIX to target platform style path. */
 static void rp_path(char *path)
 {
 #if defined(_WIN32)
@@ -211,7 +197,6 @@ static void rp_path(char *path)
 #endif
 }
 
-/** Makes a directory. */
 static int rp_mkdir(const char *path, int mode)
 {
 #if defined(_WIN32)
@@ -301,14 +286,6 @@ cleanup:
     free(path);
 }
 
-/**
- * Чтение байтов из файла в буфер.
- *
- * @param buffer      буфер
- * @param buffer_size размер буфера
- * @param params_name название параметров
- * @param file        название файла
- */
 static void load_ba_from_file(ByteArray **buffer_ba, const char *params_name, const char *file)
 {
     const char *root_path = REPORT_DIR;
@@ -687,7 +664,6 @@ static void extgen_userfiz(const SubjectPublicKeyInfo_t *spki,
     ext_free(ext);
     ext = NULL;
 
-    /* Проверить что это ext_auth_key_id, копируется ли структура? */
     EXECUTE(ext_create_auth_key_id_from_cert(false, issuer_cert, &ext));
     EXECUTE(exts_add_extension(exts, ext));
     ext_free(ext);
@@ -818,24 +794,12 @@ static void extgen_userur(const Certificate_t *issuer_cert,
     free(qc_statements);
 }
 
-/* -------------------- Генерация ключей ДСТУ 4145-2002 ------------------- */
-
-/**
- * Генерация ключей ДСТУ 4145-2002.
- *
- * @param ec_params параметры ДСТУ 4145 из Testа
- * @param cipher_params параметры ГОСТ 28147 из Testа
- * @param aid идентификатор криптографического алгоритма
- * @param key закрытый ключ
- * @param spki информация об открытом ключе
- */
 static void generate_dstu_keypair(Dstu4145Ctx *ec_params, Gost28147Ctx *cipher_params, Pkcs12Ctx **key)
 {
     Pkcs12Ctx *storage = NULL;
     ByteArray *aid_ba = NULL;
     AlgorithmIdentifier_t *aid = NULL;
 
-    /* Формируем идентификатор криптографического алгоритма. */
     bool is_le = true;
 
     EXECUTE(aid_create_dstu4145(ec_params, cipher_params, is_le, &aid));
@@ -917,23 +881,18 @@ static void generate_root_certificate_core(const char *dstu_params_name,
     EXECUTE(va->get_pub_key(va, &spki));
     EXECUTE(digest_adapter_init_by_aid(&spki->algorithm, &da));
 
-    /* Запись результата. */
     EXECUTE(creq_encode(cert_request, &encoded));
 
     save_ba_to_file(encoded, dstu_params_name, req_path);
     ba_free(encoded);
     encoded = NULL;
 
-    /* Инициализация генератора сертификатов. */
     EXECUTE(ecert_alloc(sa, da, true, &cert_engine_ctx));
 
-    /* Генерация сертификата по запросу на сертификат и серийному номеру. */
     EXECUTE(ecert_generate(cert_engine_ctx, cert_request, 2, serial_ba, not_before, not_after, extensions, &root_cert));
 
-    /* Проверка подписи под самоподписанным сертификатом. */
     EXECUTE(cert_verify(root_cert, va));
 
-    /* Запись результата. */
     EXECUTE(cert_encode(root_cert, &encoded));
 
 
@@ -977,25 +936,14 @@ static void generate_cert_core(const CertificationRequest_t *cert_request,
 
     CertificateEngine *cert_engine_ctx = NULL;
 
-    /*
-     * Настройка контекста для формирования подписи под запросом на
-     * сертификат и под самоподписанным сертификатом.
-     */
-
     EXECUTE(digest_adapter_init_by_aid(&cert_request->certificationRequestInfo.subjectPKInfo.algorithm, &da));
     EXECUTE(verify_adapter_init_by_cert(issuer_cert, &va));
     EXECUTE(pkcs12_decode(NULL, issuer_storage_body, DEFAULT_STORAGE_PASSWORD, &storage));
     EXECUTE(pkcs12_select_key(storage, NULL, DEFAULT_KEY_PASSWORD));
     EXECUTE(pkcs12_get_sign_adapter(storage, &sa));
     EXECUTE(sa->set_cert(sa, issuer_cert));
-
-    /* Инициализация генератора сертификатов. */
     EXECUTE(ecert_alloc(sa, da, false, &cert_engine_ctx));
-
-    /* Генерация сертификата по запросу на сертификат и серийному номеру. */
     EXECUTE(ecert_generate(cert_engine_ctx, cert_request, 2, serial_ba, not_before, not_after, extensions, new_cert));
-
-    /* Проверка подписи под сертификатом. */
     EXECUTE(cert_verify(*new_cert, va));
 
     ecert_free(cert_engine_ctx);
@@ -1007,7 +955,6 @@ static void generate_cert_core(const CertificationRequest_t *cert_request,
     pkcs12_free(storage);
 }
 
-/** Генерация корневого сертификата. */
 void generate_root_certificate(void)
 {
     int i;
@@ -1026,13 +973,11 @@ void generate_root_certificate(void)
     char email[] = "info@ca.ua";
     char *res_folder = NULL;
 
-    /* Серийный номер сертификата. */
     const unsigned char root_serial[] = {
         0x00, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xff, 0x00,
         0x00, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xff, 0x00
     };
 
-    /* Информация о получателе сертификата. */
     const char subject[] =
             "{O=ТЕСТ}"
             "{OU=ЦСК}"
@@ -1069,7 +1014,7 @@ void generate_root_certificate(void)
     for (i = 0; i < dstu_params_count; i++) {
         res_folder = (char *) dstu_params_name_map[i];
 
-        tprintf("        - Генерация корневой ключевой пары (%s).\n", res_folder);
+        tprintf("        - Генерація кореневої пари ключів (%s).\n", res_folder);
         generate_dstu_keypair(dstu_params[i], cipher_params, &storage);
         IS_NULL(storage);
 
@@ -1077,7 +1022,7 @@ void generate_root_certificate(void)
         EXECUTE(pkcs12_get_sign_adapter(storage, &sa));
         EXECUTE(sa->get_pub_key(sa, &spki));
 
-        tprintf("        - Генерация запроса на сертификат (%s).\n", res_folder);
+        tprintf("        - Генерація запиту на сертифікат (%s).\n", res_folder);
         EXECUTE(ecert_request_alloc(sa, &cert_request_eng));
         EXECUTE(ecert_request_set_subj_name(cert_request_eng, subject));
         EXECUTE(ecert_request_set_subj_alt_name(cert_request_eng, dns, email));
@@ -1086,7 +1031,7 @@ void generate_root_certificate(void)
         extgen_root(spki, cert_request, &extensions);
         IS_NULL(extensions);
 
-        tprintf("        - Создание корневого сертификата (%s).\n", res_folder);
+        tprintf("        - Створення корневого сертифікату (%s).\n", res_folder);
         generate_root_certificate_core(res_folder, storage, subject, &not_before, &not_after, root_serial,
                 extensions, cert_request, sa, "root/request.csr", "root/certificate.cer", "root/private.key");
 
@@ -1120,9 +1065,6 @@ static void load_certificate(const char *params_name, const char *file, Certific
     ba_free(encoded);
 }
 
-/**
- * Генерирует примеры сертификатов для физических лиц.
- */
 void generate_user_fiz_certificate(void)
 {
     int i;
@@ -1148,15 +1090,12 @@ void generate_user_fiz_certificate(void)
 
     char subject_attr[] = "{1.2.804.2.1.1.1.11.1.4.1.1=292431128}";
 
-    /* Серийный номер сертификата. */
     const unsigned char serial[] = {
         0x00, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xff, 0x00,
         0x00, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xff, 0x02
     };
 
     char *res_folder;
-
-    /* Информация о получателе сертификата. */
     const char subject[] =
             "{O=Петров Василь Олександрович ФОП}"
             "{OU=Керiвництво}"
@@ -1197,7 +1136,7 @@ void generate_user_fiz_certificate(void)
 
         res_folder = (char *)dstu_params_name_map[i];
 
-        tprintf("        - Генерация ключевой пары (%s).\n", res_folder);
+        tprintf("        - Генерація пари ключів (%s).\n", res_folder);
 
         generate_dstu_keypair(dstu_params[i], cipher_params, &subject_storage);
         IS_NULL(subject_storage);
@@ -1209,20 +1148,18 @@ void generate_user_fiz_certificate(void)
         EXECUTE(ecert_request_set_subj_dir_attr(cert_request_eng, subject_attr));
         EXECUTE(ecert_request_generate(cert_request_eng, &subject_cert_request));
 
-        /* Запись cert_request. */
         EXECUTE(creq_encode(subject_cert_request, &encoded));
         save_ba_to_file(encoded, res_folder, "userfiz/request.csr");
         ba_free(encoded);
         encoded = NULL;
 
-        /* Чтение закрытого ключа и сертификата подписчика. */
         load_ba_from_file(&issuer_key_body, res_folder, "root/private.key");
         load_certificate(res_folder, "root/certificate.cer", &issuer_cert);
 
         extgen_userfiz(subject_spki, issuer_cert, subject_cert_request, &extensions);
         IS_NULL(extensions);
 
-        tprintf("        - Создание сертификата для физических лиц (%s).\n", res_folder);
+        tprintf("        - Створення сертифікату для физических лиц (%s).\n", res_folder);
 
         generate_cert_core(subject_cert_request,
                 &not_before,
@@ -1233,7 +1170,6 @@ void generate_user_fiz_certificate(void)
                 issuer_cert,
                 &subject_cert);
 
-        /* Запись сформированного сертификата. */
         EXECUTE(cert_encode(subject_cert, &encoded));
         save_ba_to_file(encoded, res_folder, "userfiz/certificate.cer");
 
@@ -1277,7 +1213,6 @@ void generate_user_fiz_certificate(void)
     }
 }
 
-/** Генерация сертификата для юридических лиц. */
 void generate_user_ur_certificate(void)
 {
     int i;
@@ -1305,13 +1240,11 @@ void generate_user_ur_certificate(void)
     char subject_attr[] = "{1.2.804.2.1.1.1.11.1.4.2.1=23456}";
     char *res_folder;
 
-    /* Серийный номер сертификата. */
     const unsigned char serial[] = {
         0x00, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xff, 0x00,
         0x00, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xff, 0x03
     };
 
-    /* Информация о получателе сертификата. */
     const char subject[] =
             "{O=ООО ТЕСТ}"
             "{OU=КЗИ}"
@@ -1349,7 +1282,7 @@ void generate_user_ur_certificate(void)
 
         res_folder = (char *)dstu_params_name_map[i];
 
-        tprintf("        - Генерация ключевой пары (%s).\n", res_folder);
+        tprintf("        - Генерація пари ключів (%s).\n", res_folder);
 
         generate_dstu_keypair(dstu_params[i], cipher_params, &subject_storage);
         IS_NULL(subject_storage);
@@ -1361,28 +1294,24 @@ void generate_user_ur_certificate(void)
         EXECUTE(ecert_request_set_subj_name(cert_request_eng, subject));
         EXECUTE(ecert_request_set_subj_dir_attr(cert_request_eng, subject_attr));
         EXECUTE(ecert_request_generate(cert_request_eng, &subject_cert_request));
-
-        /* Запись subject_cert_request. */
         EXECUTE(creq_encode(subject_cert_request, &encoded));
         save_ba_to_file(encoded, res_folder, "userur/request.csr");
 
         ba_free(encoded);
         encoded = NULL;
 
-        /* Чтение закрытого ключа и сертификата подписчика. */
         load_ba_from_file(&issuer_storage_body, res_folder, "root/private.key");
         load_certificate(res_folder, "root/certificate.cer", &issuer_cert);
 
         extgen_userur(issuer_cert, subject_spki, subject_da, subject_cert_request, &extensions);
         IS_NULL(extensions);
 
-        tprintf("        - Создание сертификата для юридических лиц (%s).\n", res_folder);
+        tprintf("        - Створення сертифікату для юридических лиц (%s).\n", res_folder);
 
         generate_cert_core(subject_cert_request, &not_before, &not_after, serial, extensions, issuer_storage_body, issuer_cert,
                 &subject_cert);
 
 
-        /* Запись сформированного сертификата. */
         EXECUTE(cert_encode(subject_cert, &encoded));
         save_ba_to_file(encoded, res_folder, "userur/certificate.cer");
 
@@ -1443,13 +1372,7 @@ static void create_signed_data_container(const ByteArray *data,
 
     DigestAdapter *da = NULL;
 
-    /*
-     * Настройка контекста для формирования подписи под запросом на
-     * сертификат и под самоподписанным сертификатом.
-     */
-
     EXECUTE(digest_adapter_init_by_cert(cert, &da));
-
     EXECUTE(sa->set_cert(sa, cert));
     EXECUTE(esigner_info_alloc(sa, da, NULL, &signer_info_ctx));
 
@@ -1773,7 +1696,6 @@ static void create_tsp_response(const Certificate_t *tsp_cert,
 
     ASN_SET_ADD(tsp_digest_algs, hash_alg);
 
-    /* Адаптер хеширования с SBOX по умолчанию. */
     EXECUTE(digest_adapter_init_default(&da));
     EXECUTE(pkcs12_get_sign_adapter(tsp_storage, &sa));
     EXECUTE(sa->set_cert(sa, tsp_cert));
@@ -1913,7 +1835,6 @@ void generate_signed_data_container(void)
 
         res_folder = (char *)dstu_params_name_map[i];
 
-        /* Инициализация сертификата подписчика. */
         load_ba_from_file(&user_storage_body, res_folder, "userfiz/private.key");
         load_certificate(res_folder, "userfiz/certificate.cer", &user_cert);
 
@@ -1924,7 +1845,7 @@ void generate_signed_data_container(void)
         data = ba_alloc_by_len(100);
         EXECUTE(ba_set(data, 0xf0));
 
-        tprintf("        - Генерация контейнера подписи (%s).\n", res_folder);
+        tprintf("        - Генерація контейнеру підпису (%s).\n", res_folder);
 
         create_signed_data_container(data, user_cert, user_sa, true, NULL, NULL, &content_info);
         IS_NULL(content_info);
@@ -1933,7 +1854,7 @@ void generate_signed_data_container(void)
         EXECUTE(cinfo_encode(content_info, &buffer));
         save_ba_to_file(buffer, res_folder, "userfiz/signed_data_container.p7s");
 
-        tprintf("        - Проверка подписи (%s).\n", res_folder);
+        tprintf("        - Проверка підпису (%s).\n", res_folder);
 
         verify_signed_data_container(buffer);
 
@@ -1958,7 +1879,7 @@ void generate_signed_data_container(void)
         cinfo_free(content_info);
         content_info = NULL;
 
-        tprintf("        - Генерация контейнера подписи без сертификата (%s).\n",
+        tprintf("        - Генерація контейнеру підпису без сертифікату (%s).\n",
                 res_folder);
 
         create_signed_data_container(data, user_cert, user_sa, false, NULL, NULL, &content_info);
@@ -1974,8 +1895,6 @@ void generate_signed_data_container(void)
         cinfo_free(content_info);
         content_info = NULL;
 
-        /** Генерация контейнера подписи формата EPES. */
-
         ASN_ALLOC(spi);
         spi->present = SignaturePolicyIdentifier_PR_signaturePolicyId;
         EXECUTE(pkix_set_oid(oids_get_oid_numbers_by_id(OID_PKI_UKR_EDS_CP_ID), &spi->choice.signaturePolicyId.sigPolicyId));
@@ -1986,7 +1905,7 @@ void generate_signed_data_container(void)
         ASN_SET_ADD(&attrs->list, attr);
         attr = NULL;
 
-        tprintf("        - Генерация контейнера подписи формата EPES (%s).\n", res_folder);
+        tprintf("        - Генерація контейнеру підпису формата EPES (%s).\n", res_folder);
 
         create_signed_data_container(data,  user_cert, user_sa, true, attrs, NULL, &content_info);
         IS_NULL(content_info);
@@ -1995,7 +1914,7 @@ void generate_signed_data_container(void)
         EXECUTE(cinfo_encode(content_info, &buffer));
         save_ba_to_file(buffer, res_folder, "userfiz/signed_data_container_epes.p7s");
 
-        tprintf("        - Проверка подписи (%s).\n", res_folder);
+        tprintf("        - Проверка підпису (%s).\n", res_folder);
         verify_signed_data_container(buffer);
 
 
@@ -2022,9 +1941,8 @@ void generate_signed_data_container(void)
         ASN_FREE(get_SignaturePolicyIdentifier_desc(), spi);
         spi = NULL;
 
-        /** Генерация контейнера подписи формата CAdES-C. */
+        /** Генерація контейнеру підпису формата CAdES-C. */
 
-        /* Инициализация сертификата подписчика. */
         load_certificate(res_folder, "tsp/certificate.cer", &tsp_cert);
         load_ba_from_file(&storage_body, res_folder, "tsp/private.key");
         load_ba_from_file(&encoded, res_folder, "root/certificate.cer");
@@ -2039,7 +1957,6 @@ void generate_signed_data_container(void)
         ba_free(encoded);
         encoded = NULL;
 
-        /* Инициализация полного списка отозванных сертификатов. */
         load_ba_from_file(&encoded, res_folder, "crl/full.crl");
         full_crl = crl_alloc();
         IS_NULL(full_crl);
@@ -2057,7 +1974,7 @@ void generate_signed_data_container(void)
         ASN_SET_ADD(&attrs->list, attr);
         attr = NULL;
 
-        tprintf("        - Генерация контейнера подписи формата CAdES-C (%s).\n", res_folder);
+        tprintf("        - Генерація контейнеру підпису формата CAdES-C (%s).\n", res_folder);
 
         create_signed_data_container(data, user_cert, user_sa, true, NULL, attrs, &content_info);
         IS_NULL(content_info);
@@ -2118,7 +2035,7 @@ void generate_signed_data_container(void)
         EXECUTE(cinfo_encode(content_info, &buffer));
         save_ba_to_file(buffer, res_folder, "userfiz/signed_data_container_c.p7s");
 
-        tprintf("        - Проверка подписи (%s).\n", res_folder);
+        tprintf("        - Проверка підпису (%s).\n", res_folder);
         verify_signed_data_container(buffer);
 
         sdata_free(sdata);
@@ -2168,7 +2085,7 @@ void generate_signed_data_container(void)
         ASN_FREE(get_SignerInfos_desc(), sinfos);
         sinfos = NULL;
 
-        /** Генерация контейнера подписи формата CAdES-X. */
+        /** Генерація контейнеру підпису формата CAdES-X. */
 
         load_ba_from_file(&storage_body, res_folder, "ocsp/private.key");
         load_certificate(res_folder, "ocsp/certificate.cer", &ocsp_cert);
@@ -2198,7 +2115,7 @@ void generate_signed_data_container(void)
         ASN_SET_ADD(&attrs->list, attr);
         attr = NULL;
 
-        tprintf("        - Генерация контейнера подписи формата CAdES-X (%s).\n", res_folder);
+        tprintf("        - Генерація контейнеру підпису формата CAdES-X (%s).\n", res_folder);
 
         create_signed_data_container(data, user_cert, user_sa, true, NULL, attrs, &content_info);
         IS_NULL(content_info);
@@ -2207,7 +2124,7 @@ void generate_signed_data_container(void)
         EXECUTE(cinfo_encode(content_info, &buffer));
         save_ba_to_file(buffer, res_folder, "userfiz/signed_data_container_x.p7s");
 
-        tprintf("        - Проверка подписи (%s).\n", res_folder);
+        tprintf("        - Проверка підпису (%s).\n", res_folder);
         verify_signed_data_container(buffer);
 
 
@@ -2291,12 +2208,8 @@ static void create_crl_container(const Certificate_t *cert, const Pkcs12Ctx *sto
     const char templ_name[] = "crl_fool_templ";
 
     const char templ_descr[] =
-            "Шаблон корневого самоподписанного сертификата банка";
+            "Шаблон корневого самоподписанного сертифікату банка";
 
-    /*
-     * Настройка контекста для формирования подписи под запросом на
-     * сертификат и под самоподписанным сертификатом.
-     */
     /* Init adapters. */
     EXECUTE(pkcs12_get_sign_adapter(storage, &sa));
     EXECUTE(sa->set_cert(sa, cert));
@@ -2391,7 +2304,7 @@ static void create_delta_container(const CertificateList_t *full,
     const char templ_name[] = "crl_delta_templ";
 
     const char templ_descr[] =
-            "Шаблон корневого самоподписанного сертификата банка";
+            "Шаблон корневого самопідписаного сертифікату банка";
 
     EXECUTE(pkcs12_get_sign_adapter(storage, &sa));
     EXECUTE(sa->set_cert(sa, cert));
@@ -2489,13 +2402,13 @@ void generate_crl_container(void)
 
         res_folder = (char *)dstu_params_name_map[i];
 
-        /* Инициализация сертификата подписчика. */
+        /* Инициализация сертифікату подписчика. */
         load_ba_from_file(&storage_body, res_folder, "root/private.key");
         EXECUTE(pkcs12_decode(NULL, storage_body, DEFAULT_STORAGE_PASSWORD, &storage));
         EXECUTE(pkcs12_select_key(storage, NULL, DEFAULT_KEY_PASSWORD));
         load_certificate(res_folder, "root/certificate.cer", &issuer_cert);
 
-        tprintf("        - Генерация полного списка отозванных сертификатов - FULL CRL (%s).\n",
+        tprintf("        - Генерація повного списку відкликаних сертифікатів - FULL CRL (%s).\n",
                 res_folder);
 
         create_crl_container(issuer_cert, storage, &full_crl);
@@ -2503,7 +2416,7 @@ void generate_crl_container(void)
             break;
         }
 
-        tprintf("        - Генерация частичного списка отозванных сертификатов - DELTA CRL (%s).\n",
+        tprintf("        - Генерація часткового списку відкликаних сертифікатів - DELTA CRL (%s).\n",
                 res_folder);
 
         create_delta_container(full_crl, issuer_cert, storage, &delta_crl);
@@ -2539,7 +2452,7 @@ void generate_crl_container(void)
     }
 }
 
-/* -------------------- Генерация симметричного ключа ГОСТ-28147 ------------------- */
+/* -------------------- Генерація симметричного ключа ГОСТ-28147 ------------------- */
 
 static void create_enveloped_data_container(const OBJECT_IDENTIFIER_t *cipher_oid,
         const DhAdapter *storage_dha,
@@ -2609,19 +2522,6 @@ static void create_enveloped_data_container(const OBJECT_IDENTIFIER_t *cipher_oi
     ba_free(encrypted_data);
 }
 
-/**
- * Рашифровывает сообщение из контейнера с защищенными данными.
- *
- * @param ci             контейнер с защищенными данными
- * @param subject_priv_key закрытый ключ получателя
- * @param subject_priv_key_len размер закрытого ключа получателя
- * @param subject_cert    сертификат получателя
- * @param issuer_cert_optional сертификат подписчика, если не указан, то ищется в контейнере с защищенными данными
- * @param decrypted_data расшифрованные данные
- * @param len размер расшифрованных данных
- *
- * @return расшифрованое сообщение
- */
 static void decrypt_enveloped_data(const ContentInfo_t *ci,
         const DhAdapter *subject_dha,
         const Certificate_t *subject_cert,
@@ -2740,9 +2640,9 @@ void generate_enveloped_data_static(void)
         get_first_dha(subject_storage_body, &subject_dha);
         IS_NULL(subject_dha);
 
-        tprintf("        - Генерация контейнера защищенных данных\n"
-                "          с применением алгоритма шифрования ГОСТ 28147 в решиме CFB.\n"
-                "          Сертификата отправителя в контейнере не сохраняется (%s).\n",
+        tprintf("        - Генерація контейнеру захищених даних\n"
+                "          з використанням алгоритма шифрования ГОСТ 28147 в режимі CFB.\n"
+                "          Сертифікат відправника в контейнері не зберігається (%s).\n",
                 dstu_params_name_map[i]);
 
 
@@ -2757,7 +2657,7 @@ void generate_enveloped_data_static(void)
         ba_free(buffer);
         buffer = NULL;
 
-        tprintf("        - Проверка контейнера (%s).\n", dstu_params_name_map[i]);
+        tprintf("        - Перевірка контейнеру (%s).\n", dstu_params_name_map[i]);
 
         decrypt_enveloped_data(enveloped_data, subject_dha, subject_cert, issuer_cert, &decrypted_data);
         IS_NULL(decrypted_data);
@@ -2773,9 +2673,9 @@ void generate_enveloped_data_static(void)
         ASN_FREE(get_OBJECT_IDENTIFIER_desc(), cipher_oid);
         cipher_oid = NULL;
 
-        tprintf("        - Генерация контейнера защищенных данных\n"
-                "          с применением алгоритма шифрования ГОСТ 28147 в решиме CFB.\n"
-                "          Сертификата отправителя в контейнере сохраняется (%s).\n",
+        tprintf("        - Генерація контейнеру захищених даних\n"
+                "          з використанням алгоритма шифрования ГОСТ 28147 в режимі CFB.\n"
+                "          Сертифікат відправника в контейнері сохраняется (%s).\n",
                 dstu_params_name_map[i]);
 
 
@@ -2789,7 +2689,7 @@ void generate_enveloped_data_static(void)
         ba_free(buffer);
         buffer = NULL;
 
-        tprintf("        - Проверка контейнера (%s).\n", dstu_params_name_map[i]);
+        tprintf("        - Перевірка контейнеру (%s).\n", dstu_params_name_map[i]);
 
 
         decrypt_enveloped_data(enveloped_data, subject_dha, subject_cert, NULL, &decrypted_data);
@@ -2805,9 +2705,9 @@ void generate_enveloped_data_static(void)
         ASN_FREE(get_OBJECT_IDENTIFIER_desc(), cipher_oid);
         cipher_oid = NULL;
 
-        tprintf("        - Генерация контейнера защищенных данных\n"
-                "          с применением алгоритма шифрования ГОСТ 28147 в решиме OFB.\n"
-                "          Сертификата отправителя в контейнере не сохраняется (%s).\n",
+        tprintf("        - Генерація контейнеру захищених даних\n"
+                "          з використанням алгоритма шифрования ГОСТ 28147 в режимі OFB.\n"
+                "          Сертифікат відправника в контейнері не зберігається (%s).\n",
                 dstu_params_name_map[i]);
 
 
@@ -2821,7 +2721,7 @@ void generate_enveloped_data_static(void)
         ba_free(buffer);
         buffer = NULL;
 
-        tprintf("        - Проверка контейнера (%s).\n", dstu_params_name_map[i]);
+        tprintf("        - Перевірка контейнеру (%s).\n", dstu_params_name_map[i]);
 
 
         decrypt_enveloped_data(enveloped_data, subject_dha, subject_cert, issuer_cert, &decrypted_data);
@@ -2838,9 +2738,9 @@ void generate_enveloped_data_static(void)
         ASN_FREE(get_OBJECT_IDENTIFIER_desc(), cipher_oid);
         cipher_oid = NULL;
 
-        tprintf("        - Генерация контейнера защищенных данных\n"
-                "          с применением алгоритма шифрования ГОСТ 28147 в решиме OFB.\n"
-                "          Сертификата отправителя в контейнере сохраняется (%s).\n",
+        tprintf("        - Генерація контейнеру захищених даних\n"
+                "          з використанням алгоритма шифрования ГОСТ 28147 в режимі OFB.\n"
+                "          Сертифікат відправника в контейнері сохраняется (%s).\n",
                 dstu_params_name_map[i]);
 
 
@@ -2854,7 +2754,7 @@ void generate_enveloped_data_static(void)
         ba_free(buffer);
         buffer = NULL;
 
-        tprintf("        - Проверка контейнера (%s).\n", dstu_params_name_map[i]);
+        tprintf("        - Перевірка контейнеру (%s).\n", dstu_params_name_map[i]);
 
 
         decrypt_enveloped_data(enveloped_data, subject_dha, subject_cert, NULL, &decrypted_data);
@@ -2944,9 +2844,9 @@ void generate_enveloped_data_dynamic(void)
         get_first_dha(subject_storage_body, &subject_dha);
         IS_NULL(subject_dha);
 
-        tprintf("        - Генерация контейнера защищенных данных\n"
-                "          с применением алгоритма шифрования ГОСТ 28147 в решиме CFB.\n"
-                "          Сертификата отправителя в контейнере не сохраняется(%s).\n",
+        tprintf("        - Генерація контейнеру захищених даних\n"
+                "          з використанням алгоритма шифрования ГОСТ 28147 в режимі CFB.\n"
+                "          Сертифікат відправника в контейнері не зберігається(%s).\n",
                 dstu_params_name_map[issuer_params]);
 
 
@@ -2959,7 +2859,7 @@ void generate_enveloped_data_dynamic(void)
         ba_free(buffer);
         buffer = NULL;
 
-        tprintf("        - Проверка контейнера (%s).\n", dstu_params_name_map[issuer_params]);
+        tprintf("        - Перевірка контейнеру (%s).\n", dstu_params_name_map[issuer_params]);
 
 
         decrypt_enveloped_data(enveloped_data, subject_dha, subject_cert, issuer_cert, &decrypted_data);
@@ -2975,9 +2875,9 @@ void generate_enveloped_data_dynamic(void)
         cinfo_free(enveloped_data);
         enveloped_data = NULL;
 
-        tprintf("        - Генерация контейнера защищенных данных\n"
-                "          с применением алгоритма шифрования ГОСТ 28147 в решиме OFB.\n"
-                "          Сертификата отправителя в контейнере не сохраняется(%s).\n",
+        tprintf("        - Генерація контейнеру захищених даних\n"
+                "          з використанням алгоритма шифрования ГОСТ 28147 в режимі OFB.\n"
+                "          Сертифікат відправника в контейнері не зберігається(%s).\n",
                 dstu_params_name_map[issuer_params]);
 
 
@@ -2991,7 +2891,7 @@ void generate_enveloped_data_dynamic(void)
         ba_free(buffer);
         buffer = NULL;
 
-        tprintf("        - Проверка контейнера (%s).\n", dstu_params_name_map[issuer_params]);
+        tprintf("        - Перевірка контейнеру (%s).\n", dstu_params_name_map[issuer_params]);
 
 
         decrypt_enveloped_data(enveloped_data, subject_dha, subject_cert, issuer_cert, &decrypted_data);
@@ -3030,9 +2930,9 @@ void generate_enveloped_data_dynamic(void)
 
     if (issuer_cert != NULL) {
 
-        tprintf("        - Генерация контейнера защищенных данных\n"
-                "          с применением алгоритма шифрования ГОСТ 28147 в решиме CFB.\n"
-                "          Сертификата отправителя в контейнере не сохраняется(%s).\n",
+        tprintf("        - Генерація контейнеру захищених даних\n"
+                "          с використанням алгоритму шифрування ГОСТ 28147 в режимі CFB.\n"
+                "          Сертифікат відправника в контейнері не зберігається(%s).\n",
                 dstu_params_name_map[issuer_params]);
 
         EXECUTE(pkix_create_oid(oids_get_oid_numbers_by_id(OID_GOST28147_CFB_ID), &cipher_oid));
@@ -3045,7 +2945,7 @@ void generate_enveloped_data_dynamic(void)
         ba_free(buffer);
         buffer = NULL;
 
-        tprintf("        - Проверка контейнера (%s).\n", dstu_params_name_map[issuer_params]);
+        tprintf("        - Перевірка контейнеру (%s).\n", dstu_params_name_map[issuer_params]);
 
 
         decrypt_enveloped_data(enveloped_data, first_dha, first_cert, issuer_cert, &decrypted_data);
@@ -3062,9 +2962,9 @@ void generate_enveloped_data_dynamic(void)
         cinfo_free(enveloped_data);
         enveloped_data = NULL;
 
-        tprintf("        - Генерация контейнера защищенных данных\n"
-                "          с применением алгоритма шифрования ГОСТ 28147 в решиме OFB.\n"
-                "          Сертификата отправителя в контейнере не сохраняется(%s).\n",
+        tprintf("        - Генерація контейнеру захищених даних\n"
+                "          с використанням алгоритму шифровання ГОСТ 28147 в режимі OFB.\n"
+                "          Сертифікат відправника в контейнері не зберігається(%s).\n",
                 dstu_params_name_map[issuer_params]);
 
 
@@ -3077,7 +2977,7 @@ void generate_enveloped_data_dynamic(void)
         ba_free(buffer);
         buffer = NULL;
 
-        tprintf("        - Проверка контейнера (%s).\n", dstu_params_name_map[issuer_params]);
+        tprintf("        - Перевірка контейнеру (%s).\n", dstu_params_name_map[issuer_params]);
 
 
         decrypt_enveloped_data(enveloped_data, first_dha, first_cert, issuer_cert, &decrypted_data);
@@ -3108,7 +3008,6 @@ void generate_enveloped_data_dynamic(void)
     cert_free(subject_cert);
 }
 
-/** Генерация сертификата TSP-сервера. */
 void generate_tsp_certificate(void)
 {
     int i;
@@ -3133,13 +3032,11 @@ void generate_tsp_certificate(void)
 
     ByteArray *subject_storage_body = NULL;
 
-    /* Серийный номер сертификата. */
     const unsigned char tsp_serial[] = {
         0x00, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xff, 0x00,
         0x00, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xff, 0x04
     };
 
-    /* Информация о получателе сертификата. */
     const char subject[] =
             "{O=Test}"
             "{OU=ЦСК}"
@@ -3179,7 +3076,7 @@ void generate_tsp_certificate(void)
 
         res_folder = (char *) dstu_params_name_map[i];
 
-        tprintf("        - Генерация ключевой пары (%s).\n", res_folder);
+        tprintf("        - Генерація пари ключів (%s).\n", res_folder);
         generate_dstu_keypair(dstu_params[i], cipher_params, &subject_storage);
         IS_NULL(subject_storage);
 
@@ -3189,19 +3086,17 @@ void generate_tsp_certificate(void)
         EXECUTE(subject_sa->get_pub_key(subject_sa, &subject_spki));
         EXECUTE(digest_adapter_init_by_aid(&subject_spki->algorithm, &subject_da));
 
-        tprintf("        - Генерация запроса на сертификат (%s).\n", res_folder);
+        tprintf("        - Генерація запиту на сертифікат (%s).\n", res_folder);
 
         EXECUTE(ecert_request_alloc(subject_sa, &cert_request_eng));
         EXECUTE(ecert_request_set_subj_name(cert_request_eng, subject));
         EXECUTE(ecert_request_generate(cert_request_eng, &subject_cert_request));
 
-        /* Запись cert_request. */
         EXECUTE(creq_encode(subject_cert_request, &encoded));
         save_ba_to_file(encoded, res_folder, "tsp/request.csr");
         ba_free(encoded);
         encoded = NULL;
 
-        /* Чтение закрытого ключа и сертификата подписчика. */
         load_ba_from_file(&issuer_key, res_folder, "root/private.key");
         load_certificate(res_folder, "root/certificate.cer", &issuer_cert);
 
@@ -3209,12 +3104,11 @@ void generate_tsp_certificate(void)
         IS_NULL(extensions);
 
 
-        tprintf("        - Создание сертификата для TSP-сервера (%s).\n", res_folder);
+        tprintf("        - Створення сертифікату для TSP-сервера (%s).\n", res_folder);
         generate_cert_core(subject_cert_request, &not_before, &not_after, tsp_serial, extensions, issuer_key,
                 issuer_cert, &subject_cert);
 
 
-        /* Запись сформированного сертификата. */
         EXECUTE(cert_encode(subject_cert, &encoded));
         save_ba_to_file(encoded, res_folder, "tsp/certificate.cer");
 
@@ -3257,7 +3151,6 @@ void generate_tsp_certificate(void)
     }
 }
 
-/** Генерация запроса TSP. */
 void generate_tsp_request(void)
 {
     int i;
@@ -3282,7 +3175,7 @@ void generate_tsp_request(void)
             EXECUTE(pkix_create_oid(oids_get_oid_numbers_by_id(OID_PKI_TSP_POLICY_GOST_ID), &policy));
         }
 
-        tprintf("        - Генерация TSP-запроса (%s).\n", res_folder);
+        tprintf("        - Генерація TSP-запиту (%s).\n", res_folder);
         create_tsp_request(test_data, policy, &tsp_request);
         IS_NULL(tsp_request);
 
@@ -3302,7 +3195,6 @@ void generate_tsp_request(void)
     ba_free(test_data);
 }
 
-/** Генерация TSP ответа. */
 void generate_tsp_response(void)
 {
     int i;
@@ -3330,7 +3222,7 @@ void generate_tsp_response(void)
         EXECUTE(pkcs12_decode(NULL, tsp_storage_body, DEFAULT_STORAGE_PASSWORD, &tsp_storage));
         EXECUTE(pkcs12_select_key(tsp_storage, NULL, DEFAULT_KEY_PASSWORD));
 
-        tprintf("        - Генерация TSP-response (%s).\n", res_folder);
+        tprintf("        - Генерація TSP-response (%s).\n", res_folder);
         create_tsp_response(tsp_cert, tsp_request, tsp_storage, serial_number, &tsp_response);
         IS_NULL(tsp_response);
 
@@ -3359,7 +3251,6 @@ void generate_tsp_response(void)
     ASN_FREE(get_INTEGER_desc(), serial_number);
 }
 
-/** Генерация сертификата OCSP-сервера. */
 void generate_ocsp_certificate(void)
 {
     int i;
@@ -3383,7 +3274,6 @@ void generate_ocsp_certificate(void)
     DigestAdapter *subject_da = NULL;
     CertificateRequestEngine *cert_request_eng = NULL;
 
-    /* Серийный номер сертификата. */
     const unsigned char serial[] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x12, 0xA8, 0x6D, 0x18, 0xDB, 0xC8, 0xB0, 0x4C
@@ -3391,14 +3281,13 @@ void generate_ocsp_certificate(void)
 
     char *res_folder;
 
-    /* Информация о получателе сертификата. */
     const char subject[] =
             "{O=Test}"
             "{OU=ЦСК}"
             "{CN=OCSP-ЦСК Test}"
             "{SN=UA-123456789-4312}"
             "{C=UA}"
-            "{L=Днiпропетровськ}"
+            "{L=Днiпро}"
             "{ST=Дніпропетровська}";
 
     /* UTC time 25.01.23 22:00:00. */
@@ -3428,7 +3317,7 @@ void generate_ocsp_certificate(void)
     for (i = 0; i < dstu_params_count; i++) {
         res_folder = (char *) dstu_params_name_map[i];
 
-        tprintf("        - Генерация ключевой пары (%s).\n", res_folder);
+        tprintf("        - Генерація пари ключів (%s).\n", res_folder);
         generate_dstu_keypair(dstu_params[i], cipher_params, &subject_storage);
         IS_NULL(subject_storage);
 
@@ -3439,20 +3328,18 @@ void generate_ocsp_certificate(void)
         EXECUTE(digest_adapter_init_by_aid(&subject_spki->algorithm, &subject_da));
         IS_NULL(subject_da);
 
-        tprintf("        - Генерация запроса на сертификат (%s).\n", res_folder);
+        tprintf("        - Генерація запиту на сертифікат (%s).\n", res_folder);
 
         EXECUTE(ecert_request_alloc(subject_sa, &cert_request_eng));
         EXECUTE(ecert_request_set_subj_name(cert_request_eng, subject));
         EXECUTE(ecert_request_generate(cert_request_eng, &subject_cert_request));
         IS_NULL(subject_cert_request);
 
-        /* Запись cert_request. */
         EXECUTE(creq_encode(subject_cert_request, &encoded));
         save_ba_to_file(encoded, res_folder, "ocsp/request.csr");
         ba_free(encoded);
         encoded = NULL;
 
-        /* Чтение закрытого ключа и сертификата подписчика. */
         load_ba_from_file(&issuer_key, res_folder, "root/private.key");
         load_certificate(res_folder, "root/certificate.cer", &issuer_cert);
 
@@ -3460,13 +3347,12 @@ void generate_ocsp_certificate(void)
         IS_NULL(extensions);
 
 
-        tprintf("        - Создание сертификата для OCSP-сервера (%s).\n", res_folder);
+        tprintf("        - Створення сертифікату для OCSP-сервера (%s).\n", res_folder);
         generate_cert_core(subject_cert_request, &not_before, &not_after, serial, extensions, issuer_key,
                 issuer_cert, &subject_cert);
         IS_NULL(subject_cert);
 
 
-        /* Запись сформированного сертификата. */
         EXECUTE(cert_encode(subject_cert, &encoded));
         save_ba_to_file(encoded, res_folder, "ocsp/certificate.cer");
 
@@ -3510,7 +3396,7 @@ void generate_ocsp_certificate(void)
     }
 }
 
-/** Генерация запроса OCSP. */
+/** Генерація запиту OCSP. */
 void generate_ocsp_request(void)
 {
     int i;
@@ -3539,7 +3425,7 @@ void generate_ocsp_request(void)
         EXECUTE(pkcs12_decode(NULL, user_storage_body, DEFAULT_STORAGE_PASSWORD, &user_storage));
         EXECUTE(pkcs12_select_key(user_storage, NULL, DEFAULT_KEY_PASSWORD));
 
-        tprintf("        - Генерация OCSP-запроса (%s).\n", res_folder);
+        tprintf("        - Генерація OCSP-запиту (%s).\n", res_folder);
         create_ocsp_request(root_cert, user_cert, ocsp_cert, user_storage, timeout, has_nonce, &ocsp_request);
         IS_NULL(ocsp_request);
 
@@ -3569,7 +3455,7 @@ void generate_ocsp_request(void)
     }
 }
 
-/** Генерация ответа OCSP. */
+/** Генерація відповіді OCSP. */
 void generate_ocsp_response(void)
 {
     int i;
@@ -3653,7 +3539,7 @@ void generate_ocsp_response(void)
         EXECUTE(pkcs12_decode(NULL, ocsp_stprage_body, DEFAULT_STORAGE_PASSWORD, &ocsp_storage));
         EXECUTE(pkcs12_select_key(ocsp_storage, NULL, DEFAULT_KEY_PASSWORD));
 
-        tprintf("        - Генерация OCSP-ответа (%s).\n", res_folder);
+        tprintf("        - Генерація OCSP-відповіді (%s).\n", res_folder);
         create_ocsp_response(ocsp_request, root_cert, ocsp_cert, crls, ocsp_storage, current_time, &ocsp_response);
         IS_NULL(ocsp_response);
 
@@ -3695,49 +3581,49 @@ cleanup:
 
 int main(void)
 {
-    tprintf("\n\n     ========== Инициализация криптографических параметров ДСТУ 4145-2002 ==========\n\n");
+    tprintf("\n\n     ========== Ініціалізація криптографічних параметрів ДСТУ 4145-2002 ==========\n\n");
 
     dstu4145_cache_init_all_std_params();
 
     dstu4145_init_all_std_params();
     gost3411_init_std_params();
 
-    tprintf("\n\n     ========== Генерация корневых самоподписанных серитификатов ==========\n\n");
+    tprintf("\n\n     ========== Генерація корневих самопідписаних серитифікатів ==========\n\n");
 
     generate_root_certificate();
 
-    tprintf("\n\n     ========== Генерация пользовательских сертификатов ==========\n\n");
+    tprintf("\n\n     ========== Генерація користувацьких сертифікатів ==========\n\n");
 
     generate_user_fiz_certificate();
     generate_user_ur_certificate();
 
-    tprintf("\n\n     ========== Генерация списков отозванных сертификатов ==========\n\n");
+    tprintf("\n\n     ========== Генерація списків відкликаних сертифікатів ==========\n\n");
 
     generate_crl_container();
 
-    tprintf("\n\n     ========== Генерация сертификатов для TSP сервера ==========\n\n");
+    tprintf("\n\n     ========== Генерація сертифікатів для TSP сервера ==========\n\n");
 
     generate_tsp_certificate();
     generate_tsp_request();
     generate_tsp_response();
 
-    tprintf("\n\n     ========== Генерация сертификатов для OCSP сервера ==========\n\n");
+    tprintf("\n\n     ========== Генерація сертифікатів для OCSP сервера ==========\n\n");
 
     generate_ocsp_certificate();
     generate_ocsp_request();
     generate_ocsp_response();
 
-    tprintf("\n\n     ========== Генерация контейнеров подписи ==========\n\n");
+    tprintf("\n\n     ========== Генерація контейнерів підпису ==========\n\n");
 
     generate_signed_data_container();
 
-    tprintf("\n\n     ========== Генерация контейнеров защищенных данных\n"
-            "                с применением статического алгоритма согласования ключей ==========\n\n");
+    tprintf("\n\n     ========== Генерація контейнерів захищених даних\n"
+            "                з використанням статичного алгоритму узгодження ключів ==========\n\n");
 
     generate_enveloped_data_static();
 
-    tprintf("\n\n     ========== Генерация контейнеров защищенных данных\n"
-            "                с применением динамического алгоритма согласования ключей ==========\n\n");
+    tprintf("\n\n     ========== Генерація контейнерів захищених даних\n"
+            "                з використанням динамічного алгоритму узгодження ключів ==========\n\n");
 
     generate_enveloped_data_dynamic();
 
@@ -3747,7 +3633,7 @@ int main(void)
     crypto_cache_free();
     stacktrace_finalize();
 
-    tprintf("\n Total errors: %d\n\n", error_count);
+    tprintf("\n Кількість помилок: %d\n\n", error_count);
 
     return 0;
 }
