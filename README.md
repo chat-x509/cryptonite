@@ -1,6 +1,6 @@
 # Сryptonite
 
-Сryptonite - is a crypto library with support of Ukrainian cryptographic standards and cryptocontainers.
+Сryptonite - is a crypto library with support of Ukrainian cryptographic standards and PKI X.509 cryptocontainers.
 
 Implemented algorithms:
 
