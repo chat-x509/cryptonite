@@ -7,7 +7,6 @@ Implemented algorithms:
 * GOST 34.310-95 (same as GOST R 34.10-94) - digital signature
 * GOST 34.311-95 (same as GOST R 34.11-94) - hash function
 * DSTU 4145-2002 - elliptic curve digital signature
-* DSTU GOST 28147:2009 (same as GOST 28147-89) - block cipher "Magma" (Russian: "Магма")
 * DSTU 7624:2014 - symmetric block cipher "Kalyna" (Ukrainian: "Калина")
 * DSTU 7564:2014 - hash function "Kupyna" (Ukrainian: "Купина")
 * AES - block cipher "Rijndael"
