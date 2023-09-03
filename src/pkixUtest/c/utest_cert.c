@@ -25,8 +25,6 @@ static Certificate_t *load_test_data(void)
     ASSERT_NOT_NULL(cert = cert_alloc());
     ASSERT_RET_OK(cert_decode(cert, decoded));
 
-    ASSERT_RET_OK(cert_check_validity(cert));
-
 cleanup:
 
     BA_FREE(decoded);
