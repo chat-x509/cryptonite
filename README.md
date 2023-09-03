@@ -27,5 +27,5 @@ of information [Due date 25.11.2021](https://www.google.com/url?sa=t&rct=j&q=&es
 License
 -------
 
-MIT, ПриватБанк
+BSD 2-clause, ПриватБанк
 
