@@ -22,7 +22,7 @@ Implemented algorithms:
 * MD5 - hash function
 
 Expert opinion on the results of the Ukrainian state expertise in the field of cryptographic protection
-of information [No 04/03/02-4834 from 30.11.2016](http://www.dsszzi.gov.ua/dsszzi/control/uk/publish/article?art_id=283948&cat_id=72110) (Due date 25.11.2021)
+of information [https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwj-yKjRwI-BAxWaBhAIHR65BaQQFnoECBQQAQ&url=https%3A%2F%2Fdata.gov.ua%2Fdataset%2F17055d98-7c52-436a-99b3-b808b323b37c%2Fresource%2Fa403a039-a0ff-4c37-9b16-4a5fb807da90%2Fdownload%2Fperelik-zasobiv-kzi-20191004.ods&usg=AOvVaw281Tqw2mMGfRsKMWhmAcGs&opi=89978449](License UA.14360570.00001-01 90 01-1 due date 25.11.2021)
 "Програмний виріб криптографічного захисту інформації “CRYPTONITE” UA.14360570.00001-01 90 01-1".
 
 License
