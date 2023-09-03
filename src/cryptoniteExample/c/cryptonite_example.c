@@ -67,7 +67,7 @@ static void test_aes_ecb_core(size_t key_len)
     ByteArray *key_ba = NULL;
     ByteArray *data_ba = NULL;
 
-    PR("----Проверка AES режима ECB c размером ключа %zu.\n", key_len);
+    PR("----Перевірка AES режима ECB з розміром ключа %zu.\n", key_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(aes_generate_key, key_len));
 
@@ -95,7 +95,7 @@ static void test_aes_ctr_core(size_t key_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка AES режима CTR c размером ключа %zu.\n", key_len);
+    PR("----Перевірка AES режима CTR з розміром ключа %zu.\n", key_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(aes_generate_key, key_len));
     CHECK_NULL(iv_ba = ba_alloc_from_uint8(data, 16));
@@ -130,7 +130,7 @@ static void test_aes_cfb_core(size_t key_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка AES режима CFB c размером ключа %zu.\n", key_len);
+    PR("----Перевірка AES режима CFB з розміром ключа %zu.\n", key_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(aes_generate_key, key_len));
     CHECK_NULL(iv_ba = ba_alloc_from_uint8(data, 16));
@@ -165,7 +165,7 @@ static void test_aes_ofb_core(size_t key_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка AES режима OFB c размером ключа %zu.\n", key_len);
+    PR("----Перевірка AES режима OFB з розміром ключа %zu.\n", key_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(aes_generate_key, key_len));
     CHECK_NULL(iv_ba = ba_alloc_from_uint8(data, 16));
@@ -200,7 +200,7 @@ static void test_aes_cbc_core(size_t key_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка AES режима CBC c размером ключа %zu.\n", key_len);
+    PR("----Перевірка AES режима CBC з розміром ключа %zu.\n", key_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(aes_generate_key, key_len));
     CHECK_NULL(iv_ba = ba_alloc_from_uint8(data, 16));
@@ -234,7 +234,7 @@ static void test_tdes_ecb_core(size_t key_len)
     ByteArray *key_ba = NULL;
     ByteArray *data_ba = NULL;
 
-    PR("----Проверка TDES режима ECB c размером ключа %zu.\n", key_len);
+    PR("----Перевірка TDES режима ECB з розміром ключа %zu.\n", key_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(des_generate_key, key_len));
 
@@ -262,7 +262,7 @@ static void test_tdes_ctr_core(size_t key_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка TDES режима CTR c размером ключа %zu.\n", key_len);
+    PR("----Перевірка TDES режима CTR з розміром ключа %zu.\n", key_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(des_generate_key, key_len));
     CHECK_NULL(iv_ba = ba_alloc_from_uint8(data, 8));
@@ -297,7 +297,7 @@ static void test_tdes_ofb_core(size_t key_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка TDES режима OFB c размером ключа %zu.\n", key_len);
+    PR("----Перевірка TDES режима OFB з розміром ключа %zu.\n", key_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(des_generate_key, key_len));
     CHECK_NULL(iv_ba = ba_alloc_from_uint8(data, 8));
@@ -332,7 +332,7 @@ static void test_tdes_cbc_core(size_t key_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка TDES режима CBC c размером ключа %zu.\n", key_len);
+    PR("----Перевірка TDES режима CBC з розміром ключа %zu.\n", key_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(des_generate_key, key_len));
     CHECK_NULL(iv_ba = ba_alloc_from_uint8(data, 8));
@@ -367,7 +367,7 @@ static void test_tdes_cfb_core(size_t key_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка TDES режима CFB c размером ключа %zu.\n", key_len);
+    PR("----Перевірка TDES режима CFB з розміром ключа %zu.\n", key_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(des_generate_key, key_len));
     CHECK_NULL(iv_ba = ba_alloc_from_uint8(data, 8));
@@ -401,7 +401,7 @@ static void test_dstu7624_ecb_core(size_t key_len, size_t block_len)
     ByteArray *key_ba = NULL;
     ByteArray *data_ba = NULL;
 
-    PR("----Проверка ДСТУ7624 режима ECB c размером ключа %zu и размером блока %zu.\n",
+    PR("----Перевірка ДСТУ7624 режима ECB з розміром ключа %zu і розміром блока %zu.\n",
             key_len, block_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(dstu7624_generate_key, key_len));
@@ -430,7 +430,7 @@ static void test_dstu7624_ctr_core(size_t key_len, size_t block_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка ДСТУ7624 режима CTR c размером ключа %zu и размером блока %zu.\n",
+    PR("----Перевірка ДСТУ7624 режима CTR з розміром ключа %zu і розміром блока %zu.\n",
             key_len, block_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(dstu7624_generate_key, key_len));
@@ -466,7 +466,7 @@ static void test_dstu7624_ofb_core(size_t key_len, size_t block_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка ДСТУ7624 режима OFB c размером ключа %zu и размером блока %zu.\n",
+    PR("----Перевірка ДСТУ7624 режима OFB з розміром ключа %zu і розміром блока %zu.\n",
             key_len, block_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(dstu7624_generate_key, key_len));
@@ -502,7 +502,7 @@ static void test_dstu7624_cbc_core(size_t key_len, size_t block_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка ДСТУ7624 режима CBC c размером ключа %zu и размером блока %zu.\n",
+    PR("----Перевірка ДСТУ7624 режима CBC з розміром ключа %zu і розміром блока %zu.\n",
             key_len, block_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(dstu7624_generate_key, key_len));
@@ -538,7 +538,7 @@ static void test_dstu7624_cfb_core(size_t key_len, size_t block_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка ДСТУ7624 режима CFB c размером ключа %zu и размером блока %zu.\n",
+    PR("----Перевірка ДСТУ7624 режима CFB з розміром ключа %zu і розміром блока %zu.\n",
             key_len, block_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(dstu7624_generate_key, key_len));
@@ -573,7 +573,7 @@ static void test_dstu7624_kw_core(size_t key_len, size_t block_len)
     ByteArray *key_ba = NULL;
     ByteArray *data_ba = NULL;
 
-    PR("----Проверка ДСТУ7624 режима KW c размером ключа %zu и размером блока %zu.\n",
+    PR("----Перевірка ДСТУ7624 режима KW з розміром ключа %zu і розміром блока %zu.\n",
             key_len, block_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(dstu7624_generate_key, key_len));
@@ -607,7 +607,7 @@ static void test_dstu7624_xts_core(size_t key_len, size_t block_len)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка ДСТУ7624 режима XTS c размером ключа %zu и размером блока %zu.\n",
+    PR("----Перевірка ДСТУ7624 режима XTS з розміром ключа %zu і розміром блока %zu.\n",
             key_len, block_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(dstu7624_generate_key, key_len));
@@ -642,7 +642,7 @@ static void test_dstu7624_cmac_core(size_t key_len, size_t block_len)
     ByteArray *key_ba = NULL;
     ByteArray *data_ba = NULL;
 
-    PR("----Проверка ДСТУ7624 режима CMAC c размером ключа %zu и размером блока %zu.\n",
+    PR("----Перевірка ДСТУ7624 режима CMAC з розміром ключа %zu і розміром блока %zu.\n",
             key_len, block_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(dstu7624_generate_key, key_len));
@@ -668,7 +668,7 @@ static void test_dstu7624_gmac_core(size_t key_len, size_t block_len)
     ByteArray *key_ba = NULL;
     ByteArray *data_ba = NULL;
 
-    PR("----Проверка ДСТУ7624 режима GMAC c размером ключа %zu и размером блока %zu.\n",
+    PR("----Перевірка ДСТУ7624 режима GMAC з розміром ключа %zu і розміром блока %zu.\n",
             key_len, block_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(dstu7624_generate_key, key_len));
@@ -697,7 +697,7 @@ static void test_dstu7624_ccm_core(size_t key_len, size_t block_len)
     ByteArray *iv_ba = NULL;
     ByteArray *mac = NULL;
 
-    PR("----Проверка ДСТУ7624 режима CCM c размером ключа %zu и размером блока %zu.\n",
+    PR("----Перевірка ДСТУ7624 режима CCM з розміром ключа %zu і розміром блока %zu.\n",
             key_len, block_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(dstu7624_generate_key, key_len));
@@ -740,7 +740,7 @@ static void test_dstu7624_gcm_core(size_t key_len, size_t block_len)
     ByteArray *iv_ba = NULL;
     ByteArray *mac = NULL;
 
-    PR("----Проверка ДСТУ7624 режима GCM c размером ключа %zu и размером блока %zu.\n",
+    PR("----Перевірка ДСТУ7624 режима GCM з розміром ключа %zu і розміром блока %zu.\n",
             key_len, block_len);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(dstu7624_generate_key, key_len));
@@ -779,7 +779,7 @@ static void test_gsot28147_ecb_core(void)
     ByteArray *key_ba = NULL;
     ByteArray *data_ba = NULL;
 
-    PR("----Проверка GOST28147 режима ECB c размером ключа %d.\n", 32);
+    PR("----Перевірка GOST28147 режима ECB з розміром ключа %d.\n", 32);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = generate_ba_key(aes_generate_key, 32));
 
@@ -807,7 +807,7 @@ static void test_gost28147_ctr_core(void)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка GOST28147 режима CTR c размером ключа %d.\n", 32);
+    PR("----Перевірка GOST28147 режима CTR з розміром ключа %d.\n", 32);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = ba_alloc_from_uint8(data, 32));
     CHECK_NULL(iv_ba = ba_alloc_from_uint8(data, 8));
@@ -842,7 +842,7 @@ static void test_gost28147_cfb_core(void)
     ByteArray *data_ba = NULL;
     ByteArray *iv_ba = NULL;
 
-    PR("----Проверка GOST28147 режима CFB c размером ключа %d.\n", 32);
+    PR("----Перевірка GOST28147 режима CFB з розміром ключа %d.\n", 32);
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = ba_alloc_from_uint8(data, 32));
     CHECK_NULL(iv_ba = ba_alloc_from_uint8(data, 8));
@@ -874,7 +874,7 @@ static void test_dstu7564_hash_core(size_t hash_len)
     ByteArray *actual = NULL;
     Dstu7564Ctx *ctx = dstu7564_alloc(DSTU7564_SBOX_1);
 
-    PR("----Проверка хэша ДСТУ7564 c размером хэша %zu.\n", hash_len);
+    PR("----Перевірка хешу ДСТУ7564 з розміром хешу %zu.\n", hash_len);
 
     CHECK_NULL(ctx);
     CHECK_RET(dstu7564_init(ctx, hash_len));
@@ -895,7 +895,7 @@ static void test_dstu7564_hmac_core(size_t hmac_len)
     ByteArray *hmac = NULL;
     Dstu7564Ctx *ctx = NULL;
 
-    PR("----Проверка мака ДСТУ7564 c размером ключа %zu.\n", hmac_len);
+    PR("----Перевірка мака ДСТУ7564 з розміром ключа %zu.\n", hmac_len);
 
     CHECK_NULL(ctx = dstu7564_alloc(DSTU7564_SBOX_1));
     CHECK_RET(dstu7564_init_kmac(ctx, key, hmac_len));
@@ -917,7 +917,7 @@ static void test_gost34311_hash_core(void)
     ByteArray *actual = NULL;
     Gost34311Ctx *ctx = gost34_311_alloc(GOST28147_SBOX_ID_1, sync);
 
-    PR("----Проверка хэша ГОСТ34311.\n");
+    PR("----Перевірка хешу ГОСТ34311.\n");
 
     CHECK_NULL(ctx);
     CHECK_RET(gost34_311_update(ctx, data_ba));
@@ -937,7 +937,7 @@ static void test_md5_hash_core(void)
     ByteArray *hash = NULL;
     Md5Ctx *ctx = NULL;
 
-    PR("----Проверка хэша MD5.\n");
+    PR("----Перевірка хешу MD5.\n");
     CHECK_NULL(ctx = md5_alloc());
     CHECK_RET(md5_update(ctx, data_ba));
     CHECK_RET(md5_final(ctx, &hash));
@@ -955,7 +955,7 @@ static void test_sha1_core(void)
     ByteArray *actual = NULL;
     Sha1Ctx *ctx = sha1_alloc();
 
-    PR("----Проверка хэша SHA1.\n");
+    PR("----Перевірка хешу SHA1.\n");
 
     CHECK_NULL(ctx);
     CHECK_RET(sha1_update(ctx, data_ba));
@@ -976,16 +976,16 @@ static void test_sha2_hash_core(Sha2Variant variant)
 
     switch (variant) {
     case SHA2_VARIANT_224:
-        PR("----Проверка хэша SHA224.\n");
+        PR("----Перевірка хешу SHA224.\n");
         break;
     case SHA2_VARIANT_256:
-        PR("----Проверка хэша SHA256.\n");
+        PR("----Перевірка хешу SHA256.\n");
         break;
     case SHA2_VARIANT_384:
-        PR("----Проверка хэша SHA384.\n");
+        PR("----Перевірка хешу SHA384.\n");
         break;
     case SHA2_VARIANT_512:
-        PR("----Проверка хэша SHA512.\n");
+        PR("----Перевірка хешу SHA512.\n");
         break;
     default:
         break;
@@ -1010,7 +1010,7 @@ static void test_gost28147_mac_core(void)
     ByteArray *key_ba = NULL;
     ByteArray *data_ba = NULL;
 
-    PR("----Проверка GOST28147 режима MAC.\n");
+    PR("----Перевірка GOST28147 режиму MAC.\n");
     CHECK_NULL(data_ba = ba_alloc_from_uint8(data, 64));
     CHECK_NULL(key_ba = ba_alloc_from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
 
@@ -1034,7 +1034,7 @@ void test_md5_hmac_core(void)
     ByteArray *hmac = NULL;
     HmacCtx *ctx = NULL;
 
-    PR("----Проверка мака в MD5.\n");
+    PR("----Перевірка мака в MD5.\n");
     CHECK_NULL(ctx = hmac_alloc_md5());
     CHECK_RET(hmac_init(ctx, key));
     CHECK_RET(hmac_update(ctx, data));
@@ -1055,7 +1055,7 @@ void test_sha1_hmac_core(void)
     ByteArray *hmac = NULL;
     HmacCtx *ctx = NULL;
 
-    PR("----Проверка мака в SHA1.\n");
+    PR("----Перевірка мака в SHA1.\n");
     CHECK_NULL(ctx = hmac_alloc_sha1());
     CHECK_RET(hmac_init(ctx, key));
     CHECK_RET(hmac_update(ctx, data));
@@ -1078,16 +1078,16 @@ void test_sha2_hmac_core(Sha2Variant variant)
 
     switch (variant) {
     case SHA2_VARIANT_224:
-        PR("----Проверка мака SHA224.\n");
+        PR("----Перевірка мака SHA224.\n");
         break;
     case SHA2_VARIANT_256:
-        PR("----Проверка мака SHA256.\n");
+        PR("----Перевірка мака SHA256.\n");
         break;
     case SHA2_VARIANT_384:
-        PR("----Проверка мака SHA384.\n");
+        PR("----Перевірка мака SHA384.\n");
         break;
     case SHA2_VARIANT_512:
-        PR("----Проверка мака SHA512.\n");
+        PR("----Перевірка мака SHA512.\n");
         break;
     default:
         break;
@@ -1116,7 +1116,7 @@ void test_dsa_sign_core(void)
     ByteArray *s = NULL;
     ByteArray *hash_ba = ba_alloc_from_str("aaaaaaaaaaaaaaaaaaaa");
 
-    PR("----Проверка подписи DSA.\n");
+    PR("----Перевірка підпису DSA.\n");
 
     CHECK_NULL(seed = ba_alloc_by_len(40));
     ba_set(seed, 0xba);
@@ -1157,7 +1157,7 @@ void test_rsa_sign_core(void)
     uint8_t e_u8 = 3;
     ByteArray *e = ba_alloc_from_uint8(&e_u8, 1);
 
-    PR("----Проверка подписи RSA PKCS v1.5.\n");
+    PR("----Перевірка підпису RSA PKCS v1.5.\n");
 
     CHECK_NULL(seed = ba_alloc_by_len(40));
     ba_set(seed, 0xba);
@@ -1196,7 +1196,7 @@ void test_ecdsa_sign_core(void)
     ByteArray *s = NULL;
     ByteArray *hash_ba = ba_alloc_from_str("aaaaaaaaaaaaaaaaaaaa");
 
-    PR("----Проверка подписи ECDSA.\n");
+    PR("----Перевірка підпису ECDSA.\n");
 
     CHECK_NULL(seed = ba_alloc_by_len(40));
     ba_set(seed, 0xba);
@@ -1238,7 +1238,7 @@ void test_dstu4145_sign_core(void)
     ByteArray *s = NULL;
     ByteArray *hash_ba = ba_alloc_from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
-    PR("----Проверка подписи DSTU4145.\n");
+    PR("----Перевірка підпису DSTU4145.\n");
 
     CHECK_NULL(seed = ba_alloc_by_len(40));
     ba_set(seed, 0xba);
@@ -1325,7 +1325,7 @@ static __inline void DSTU7564_HMAC_CORE(void)
 int main(void)
 {
 
-    PR("Проверка шифрования/рассшифрования симметричных алгоритмов.\n");
+    PR("Перевірка шифрування/розшифровування симетричних алгоритмів.\n");
 
     PR("--AES\n");
     AES_CORE(test_aes_ecb_core);
@@ -1357,7 +1357,7 @@ int main(void)
     test_gost28147_ctr_core();
     test_gost28147_cfb_core();
 
-    PR("Проверка хэширования.\n");
+    PR("Перевірка хешування.\n");
 
     PR("--DSTU7564\n");
     DSTU7564_HASH_CORE();
@@ -1374,7 +1374,7 @@ int main(void)
     PR("--SHA2\n");
     SHA2_HASH_CORE();
 
-    PR("Проверка мака.\n");
+    PR("Перевірка мака.\n");
 
     PR("--DSTU7564\n");
     DSTU7564_HMAC_CORE();
@@ -1395,7 +1395,7 @@ int main(void)
     PR("--SHA2\n");
     SHA2_HMAC_CORE();
 
-    PR("Проверка подписи ассиметричными алгоритмами.\n");
+    PR("Перевірка підпису асиметричними алгоритмами.\n");
 
     PR("--DSA\n");
     test_dsa_sign_core();
@@ -1409,7 +1409,7 @@ int main(void)
     PR("--DSTU4145\n");
     test_dstu4145_sign_core();
 
-    PR("\n Количество ошибок: %zu\n\n", error_count);
+    PR("\n Кількість помилок: %zu\n\n", error_count);
 
     return 0;
 }
