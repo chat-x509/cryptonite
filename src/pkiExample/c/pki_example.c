@@ -987,9 +987,9 @@ void generate_root_certificate(void)
             "{L=Днiпропетровськ}"
             "{ST=Дніпропетровська}";
 
-    /* UTC time 26.01.23 22:00:00. */
+    /* UTC time 26.01.33 22:00:00. */
     timeinfo = calloc(1, sizeof(struct tm));
-    timeinfo->tm_year = 123;
+    timeinfo->tm_year = 133;
     timeinfo->tm_mon  = 0;
     timeinfo->tm_mday = 25;
     timeinfo->tm_hour = 22;
@@ -1108,9 +1108,9 @@ void generate_user_fiz_certificate(void)
             "{ST=Дніпропетровська}"
             "{T=Підприємець}";
 
-    /* UTC time 25.01.23 22:00:00. */
+    /* UTC time 25.01.33 22:00:00. */
     timeinfo = calloc(sizeof(struct tm), 1);
-    timeinfo->tm_year = 123;
+    timeinfo->tm_year = 133;
     timeinfo->tm_mon  = 0;
     timeinfo->tm_mday = 25;
     timeinfo->tm_hour = 22;
@@ -1254,9 +1254,9 @@ void generate_user_ur_certificate(void)
             "{L=Днiпропетровськ}"
             "{ST=Дніпропетровська}";
 
-    /* UTC time 25.01.23 22:00:00. */
+    /* UTC time 25.01.33 22:00:00. */
     timeinfo = calloc(sizeof(struct tm), 1);
-    timeinfo->tm_year = 123;
+    timeinfo->tm_year = 133;
     timeinfo->tm_mon  = 0;
     timeinfo->tm_mday = 25;
     timeinfo->tm_hour = 22;
@@ -3048,9 +3048,9 @@ void generate_tsp_certificate(void)
 
     char *res_folder;
 
-    /* UTC time 25.01.23 22:00:00. */
+    /* UTC time 25.01.33 22:00:00. */
     timeinfo = calloc(sizeof(struct tm), 1);
-    timeinfo->tm_year = 123;
+    timeinfo->tm_year = 133;
     timeinfo->tm_mon  = 0;
     timeinfo->tm_mday = 25;
     timeinfo->tm_hour = 22;
@@ -3290,9 +3290,9 @@ void generate_ocsp_certificate(void)
             "{L=Днiпро}"
             "{ST=Дніпропетровська}";
 
-    /* UTC time 25.01.23 22:00:00. */
+    /* UTC time 25.01.33 22:00:00. */
     timeinfo = calloc(sizeof(struct tm), 1);
-    timeinfo->tm_year = 123;
+    timeinfo->tm_year = 133;
     timeinfo->tm_mon  = 0;
     timeinfo->tm_mday = 25;
     timeinfo->tm_hour = 22;

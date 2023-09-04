@@ -25,6 +25,10 @@ static Certificate_t *load_test_data(void)
     ASSERT_NOT_NULL(cert = cert_alloc());
     ASSERT_RET_OK(cert_decode(cert, decoded));
 
+    if (cert_check_validity(cert) == 0x13D) {
+        printf("OK we known that ACSK CRT is outated.\n");
+    }
+
 cleanup:
 
     BA_FREE(decoded);
