@@ -21,7 +21,6 @@ extern OptLevelId default_opt_level;
  * Шукає в кеші контекст ДСТУ 4145 зі стандартними параметрами.
  *
  * @param params_id ідентифікатор стандартних параметрів
- *
  * @return контекст ДСТУ 4145
  */
 Dstu4145Ctx *crypto_cache_get_dstu4145(Dstu4145ParamsId params_id);
@@ -36,7 +35,6 @@ Dstu4145Ctx *crypto_cache_get_dstu4145(Dstu4145ParamsId params_id);
  * @param n порядок циклічної підгрупи групи точок еліптичної кривої
  * @param px X-координата точки еліптичної кривої порядока n
  * @param py Y-координата точки еліптичної кривої порядока n
- *
  * @return контекст ДСТУ 4145
  */
 Dstu4145Ctx *crypto_cache_get_dstu4145_pb(const int *f, size_t f_len, int a, const ByteArray *b, const ByteArray *n,
@@ -51,7 +49,6 @@ Dstu4145Ctx *crypto_cache_get_dstu4145_pb(const int *f, size_t f_len, int a, con
  * @param n порядок циклічної підгрупи групи точок еліптичної кривої
  * @param px X-координата точки еліптичної кривої порядока n
  * @param py Y-координата точки еліптичної кривої порядока n
- *
  * @return контекст ДСТУ 4145
  */
 Dstu4145Ctx *crypto_cache_get_dstu4145_onb(const int m, int a, const ByteArray *b, const ByteArray *n,
@@ -66,7 +63,6 @@ Dstu4145Ctx *crypto_cache_get_dstu4145_onb(const int m, int a, const ByteArray *
  * @param q
  * @param px X-координата точки еліптичної кривої порядока n
  * @param py Y-координата точки еліптичної кривої порядока n
- *
  * @return контекст ДСТУ 4145
  */
 EcdsaCtx *crypto_cache_get_ecdsa(const ByteArray *p, const ByteArray *a, const ByteArray *b, const ByteArray *q,
