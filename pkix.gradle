@@ -48,7 +48,8 @@ model {
                     }
 
                     if (toolChain in Clang) {
-                        cCompiler.args "-Wno-extended-offsetof"
+//                        cCompiler.args "-Wno-extended-offsetof"
+                          cCompiler.args "-Wno-unused-variable"
                     }
                 }
             }

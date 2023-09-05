@@ -12,7 +12,7 @@
 /*
  * Version of the ASN.1 infrastructure shipped with compiler.
  */
-int get_asn1c_environment_version()
+int get_asn1c_environment_version(void)
 {
     return ASN1C_ENVIRONMENT_VERSION;
 }

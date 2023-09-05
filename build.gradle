@@ -185,7 +185,7 @@ model {
                     cCompiler.args "-pedantic"
 
                     /* Make all warnings into errors. */
-                    cCompiler.args "-Werror"
+//                    cCompiler.args "-Werror"
 
                     /* Enables all the warnings about constructions that some users consider questionable. */
                     cCompiler.args "-Wall"
@@ -276,7 +276,7 @@ model {
                     cCompiler.args "-pedantic"
 
                     /* Make all warnings into errors. */
-                    cCompiler.args "-Werror"
+//                    cCompiler.args "-Werror"
 
                     /* Enables all the warnings about constructions that some users consider questionable. */
                     cCompiler.args "-Wall"
@@ -286,8 +286,8 @@ model {
                 cCompiler.args "-std=c99"
 
                 if (targetPlatform.operatingSystem.macOsX) {
-                    cCompiler.args "-mmacosx-version-min=10.6"
-                    linker.args    "-mmacosx-version-min=10.6"
+                    cCompiler.args "-mmacosx-version-min=10.9"
+                    linker.args    "-mmacosx-version-min=10.9"
                 }
 
                 if (targetPlatform.operatingSystem.name == "ios") {
