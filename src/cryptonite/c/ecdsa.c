@@ -99,7 +99,7 @@ static int public_key_to_ec_point(const EcdsaParamsCtx *params, const ByteArray 
     CHECK_NOT_NULL(wqx = wa_alloc_from_ba(qx));
     CHECK_NOT_NULL(wqy = wa_alloc_from_ba(qy));
 
-    /* Проверка корректности открытого ключа 0 <= qx < p, 0 < qy < p */
+    /* Перевірка коректності відкритого ключа 0 <= qx < p, 0 < qy < p */
     if (int_cmp(wqx, params->ecp->gfp->p) >= 0) {
         SET_ERROR(RET_INVALID_PUBLIC_KEY);
     }
@@ -115,7 +115,7 @@ static int public_key_to_ec_point(const EcdsaParamsCtx *params, const ByteArray 
     wa_change_len(wqx, params->len);
     wa_change_len(wqy, params->len);
 
-    /* Открытый ключ принадлежит эллиптической кривой. */
+    /* Відкритий ключ належить елліптичній кривій. */
     if (!ecp_is_on_curve(params->ecp, wqx, wqy)) {
         SET_ERROR(RET_INVALID_PUBLIC_KEY);
     }
@@ -582,7 +582,7 @@ int ecdsa_decompress_pubkey(EcdsaCtx *ctx, const ByteArray *q, int last_qy_bit, 
         SET_ERROR(RET_INVALID_PUBLIC_KEY);
     }
 
-    /* Восстановление точки эллиптической кривой. */
+    /* Відновлення точки еліптичної кривої. */
     wa_free(y);
     y = NULL;
 
@@ -595,7 +595,7 @@ int ecdsa_decompress_pubkey(EcdsaCtx *ctx, const ByteArray *q, int last_qy_bit, 
         SET_ERROR(RET_INVALID_PUBLIC_KEY);
     }
 
-    /* Если младший бит y не равен last_qy_bit y = p - y. */
+    /* Якщо молодший біт y не дорівнює last_qy_bit y = p - y. */
     if (int_get_bit(y, 0) != last_qy_bit) {
         gfp_mod_sub(gfp, gfp->p, y, y);
     }
@@ -675,7 +675,7 @@ int ecdsa_init_sign(EcdsaCtx *ctx, const ByteArray *d, PrngCtx *prng)
         ecdsa_set_verify_precomp(ctx, verify_comb_opt_level, verify_win_opt_level);
     }
 
-    /* Проверка корректности закрытого ключа. */
+    /* Перевірка коректності закритого ключа. */
     if (int_is_zero(ctx->priv_key) || (int_cmp(ctx->priv_key, ctx->params->gfq->p) >= 0)) {
         SET_ERROR(RET_INVALID_PRIVATE_KEY);
     }
@@ -684,7 +684,7 @@ int ecdsa_init_sign(EcdsaCtx *ctx, const ByteArray *d, PrngCtx *prng)
 
     CHECK_NOT_NULL(seed = ba_alloc_by_len(128));
 
-    /* Установка датчика псевдослучайных чисел. */
+    /* Встановлення датчика псевдовипадкових чисел. */
     DO(prng_next_bytes(prng, seed));
 
     if (ctx->prng != NULL) {
@@ -751,11 +751,11 @@ int ecdsa_sign(EcdsaCtx *ctx, const ByteArray *hash, ByteArray **r, ByteArray **
     CHECK_NOT_NULL(c = ec_point_alloc(params->len));
     do {
         do {
-            /* Шаг 2. Сгенерировать случайное число k (0 < k < q).  */
+            /* Крок 2. Згенерувати випадкове число k (0 < k < q).  */
             DO(int_rand(ctx->prng, q, k));
 
-            /* Шаг 3. Вычислить точку эллиптической кривой C = kP,
-             * c = (cx, cy) и определить r = cx (mod q). */
+            /* Крок 3. Обчислити точку елліптичної кривої C = kP,
+             * c = (cx, cy) і визначити r = cx (mod q). */
             DO(ecp_dual_mul_opt(params->ecp, params->precomp_p, k, NULL, NULL, c));
 
             CHECK_NOT_NULL(t = wa_copy_with_alloc(c->x));
@@ -764,7 +764,7 @@ int ecdsa_sign(EcdsaCtx *ctx, const ByteArray *hash, ByteArray **r, ByteArray **
             wa_free(t);
             t = NULL;
 
-            /* Если r = 0, то вернуться к Шагу 2.  */
+            /* Якщо r = 0, то повернутися на Крок 2.  */
         } while (int_is_zero(wr));
 
         /* t = k^(-1);
@@ -825,7 +825,7 @@ int ecdsa_init_verify(EcdsaCtx *ctx, const ByteArray *qx, const ByteArray *qy)
         ctx->prng = NULL;
     }
 
-    /* Установка открытого ключа. */
+    /* Встановлення відкритого ключа. */
     DO(public_key_to_ec_point(ctx->params, qx, qy, &pub_key));
     if (ctx->pub_key != NULL) {
         if (wa_cmp(pub_key->x, ctx->pub_key->x) != 0 || wa_cmp(pub_key->y, ctx->pub_key->y) != 0
@@ -910,14 +910,14 @@ int ecdsa_verify(EcdsaCtx *ctx, const ByteArray *hash, const ByteArray *r, const
     len = params->len;
     q = params->gfq->p;
 
-    /* Проверка ЭЦП. */
+    /* Перевірка КЕП. */
     CHECK_NOT_NULL(wr = wa_alloc_from_ba(r));
     CHECK_NOT_NULL(ws = wa_alloc_from_ba(s));
 
     wa_change_len(wr, len);
     wa_change_len(ws, len);
 
-    /* 0 < r < n і 0 < s < n, иначе подпись неверная. */
+    /* 0 < r < n і 0 < s < n, інакше підпис невалідний. */
     if ((int_cmp(wr, ctx->params->gfq->p) >= 0) || (int_cmp(ws, ctx->params->gfq->p) >= 0)
             || int_is_zero(wr) || int_is_zero(ws)) {
         SET_ERROR(RET_VERIFY_FAILED);
@@ -931,16 +931,16 @@ int ecdsa_verify(EcdsaCtx *ctx, const ByteArray *hash, const ByteArray *r, const
         e->buf[0] = 1;
     }
 
-    /* Шаг 3. Вычислить значение s = s^(-1)(mod q). */
+    /* Крок 3. Обчислити значення s = s^(-1)(mod q). */
     s_inv = gfp_mod_inv(ctx->params->gfq, ws);
 
-    /* Шаг 4. Вычислить значения z1 = s*e(mod q), z2 = s*r(mod q). */
+    /* Крок 4. Обчислити значення z1 = s*e(mod q), z2 = s*r(mod q). */
     CHECK_NOT_NULL(z1 = wa_alloc(params->len));
     CHECK_NOT_NULL(z2 = wa_alloc(params->len));
     gfp_mod_mul(ctx->params->gfq, s_inv, e, z1);
     gfp_mod_mul(ctx->params->gfq, s_inv, wr, z2);
 
-    /* Шаг 5. Вычислить точку эллиптической кривой C = z1*P+z2*Q */
+    /* Крок 5. Обчислити точку еліптичної кривої C = z1*P+z2*Q */
     CHECK_NOT_NULL(c = ec_point_alloc(params->len));
     DO(ecp_dual_mul_opt(ctx->params->ecp, ctx->params->precomp_p, z1, ctx->precomp_q, z2, c));
 

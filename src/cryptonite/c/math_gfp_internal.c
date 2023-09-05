@@ -178,14 +178,14 @@ cleanup:
 }
 
 /**
- * Вычисляет обратный элемент в поле GF(p).
+ * Обчислює обернений елемент в полі GF(p).
  */
 WordArray *gfp_mod_inv_core(const WordArray *x, const WordArray *p)
 {
     ASSERT(!int_is_zero(x));
     ASSERT(!int_is_zero(p));
 
-    /* Если p четное - необходимо использовать базовый алгоритм поиска обратного элемента на основе расширенного алгоритма Евклида. */
+    /* Якщо p парне — необхідно використати базовий алгоритм пошуку оберненого елементу на основі розширеного алгоритму Евкліда. */
     return ((p->buf[0] & 1) == 0)
             ? gfp_mod_inv_ext_euclid(x, p)
             : gfp_mod_inv_binary(x, p);
@@ -355,7 +355,7 @@ WordArray *gfp_mod_inv(const GfpCtx *ctx, const WordArray *in)
     size_t k = 0;
     size_t len;
 
-    /* Если p четное - необходимо использовать базовый алгоритм поиска обратного элемента на основе расширенного алгоритма Евклида. */
+    /* Якщо p парне — необхідно використати базовий алгоритм пошуку оберненого елементу на основі роозширеного алгоритму Евкліда. */
     if ((ctx->p->buf[0] & 1) == 0) {
         return gfp_mod_inv_ext_euclid(in, ctx->p);
     }
@@ -503,13 +503,13 @@ void gfp_mod_dual_pow(const GfpCtx *ctx, const WordArray *a, const WordArray *x,
 }
 
 /**
- * Генерирует последовательности Лукаса.
+ * Генерує послідовності Лукаса.
  * c[0] = 2, c[1] = a, c[k] = a * c[k - 1] - b * c[k - 2] (mod p).
  *
- * @param ctx контекст простого конечного поля
- * @param a начальное значение для генерации последовательности
- * @param b начальное значение для генерации последовательности
- * @param k номер элемента последовательности Лукаса
+ * @param ctx контекст простого скінченного поля
+ * @param a початкове значення для генерації послідовності
+ * @param b початкове значення для генерації послідовності
+ * @param k номер елементу послідовності Лукаса
  * @param ck = c[k] (mod p)
  * @param bk = b^[k/2] (mod p)
  */
@@ -630,13 +630,13 @@ bool gfp_mod_sqrt(const GfpCtx *ctx, const WordArray *a, WordArray *out)
         wa_copy(a, c);
 
         do {
-            /* Генерация случайного числа 1 < b < p. */
+            /* Генерація випадкового числа 1 < b < p. */
             int_prand(ctx->p, b);
 
             /* d = d[k] (mod p) и ck = c^[k/2] (mod p). */
             gfp_mod_lucas_seq(ctx, b, c, k, d, ck);
 
-            /* Если 1 < ck < p - 1, то g квадратичный невычет. */
+            /* Если 1 < ck < p - 1, то g квадратичний лишок. */
             if ((int_cmp(ck, ctx->one) > 0) && (int_cmp(ck, e) < 0)) {
                 answ = false;
                 goto cleanup;
@@ -649,7 +649,7 @@ bool gfp_mod_sqrt(const GfpCtx *ctx, const WordArray *a, WordArray *out)
             }
             int_rshift(carry, d, 1, d);
 
-            /* Если d^2 = x (mod p), то вернуть результат. */
+            /* Якщо d^2 = x (mod p), то повернути результат. */
             gfp_mod_sqr(ctx, d, b);
 
             if (int_equals(b, a)) {
