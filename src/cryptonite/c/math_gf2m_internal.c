@@ -13,7 +13,7 @@
 #undef FILE_MARKER
 #define FILE_MARKER "cryptonite/math_gf2m_internal.c"
 
-/* Таблица предварительных вычислений для возведения у квадрат. */
+/* Таблиця попередніх обчислень для піднесення у квадрат. */
 static const uint16_t GF2M_SQR_PRECOMP[256] = {
     0x0000, 0x0001, 0x0004, 0x0005, 0x0010, 0x0011, 0x0014, 0x0015,
     0x0040, 0x0041, 0x0044, 0x0045, 0x0050, 0x0051, 0x0054, 0x0055,
@@ -122,10 +122,10 @@ void gf2m_mod(const Gf2mCtx *ctx, WordArray *a, WordArray *out)
     int alen = (int)(2 * ctx->len);
     int i;
 
-    /* Слова, содержащие x^f[0], x^f[1], x^f[2] і т.д. */
+    /* Слова, що містять x^f[0], x^f[1], x^f[2] і т.д. */
     int a_woff0, a_woff1, a_woff2, a_woff3 = 0;
 
-    /* Смещение в битах от границы слова для x^f[0], x^f[1] і т.д. */
+    /* Зсув в бітах від границі слова для x^f[0], x^f[1] і т.д. */
     word_t a_boff0, a_boff1, a_boff2, a_boff3 = 0;
 
     ASSERT(degA <= (degF << 1) - 2);
@@ -148,7 +148,7 @@ void gf2m_mod(const Gf2mCtx *ctx, WordArray *a, WordArray *out)
 
     i = (degA - (degF - (int)a_boff0)) >> WORD_BIT_LEN_SHIFT;
 
-    /* XOR сложение неполного старшего слова "a" с последовательностями, начинающимися с t-го бита, с k-го бита и т.д. */
+    /* XOR додавання неповного старшого слова "a" з послідовностями, що починаються з t-го біту, з k-го біту і т.д. */
     if (a_woff0 == i) {
         word_t T = WORD_RSHIFT(a->buf[alen - 1], a_boff0);
         int j;
@@ -178,7 +178,7 @@ void gf2m_mod(const Gf2mCtx *ctx, WordArray *a, WordArray *out)
         i--;
     }
 
-    /* XOR сложение полных слов, начиная з m-того бита с последовательностями, начинающимися з t-го бита, с k-го бита и т.д. */
+    /* XOR додавання повних слів, починаючи з m-того біту з последовностями, що починаються з t-го біту, з k-го біту и т.д. */
     while (degA >= degF) {
         for (; i >= 0; i--) {
             word_t a_woff0i = a_woff0 - i;
@@ -378,13 +378,13 @@ static uint64_t gf2m_mul_32(word_t x, word_t y)
 #endif
 
 /**
- * Выполняет умножение многочленов, степень которых меньше 256. Используется метод Карацубы.
+ * Выконує множення многочленів, степінь яких меньше 256. Використовується метод Карацуби.
  *
  * @param x многочлен 1
  * @param y многочлен 2
- * @param len длина многочленов в словах
- * @param mode указывает на изменения в многочлене r
- * @param r буфер для произведения многочленов
+ * @param len довжина многочлена в словах
+ * @param mode вказує на зміни в многочлені r
+ * @param r буфер для множення многочленів
  */
 static void gf2m_mul_256(const word_t *x, const word_t *y, int len, bool mode, word_t *r)
 {
@@ -676,11 +676,11 @@ static void wa_swap(const WordArray *x, WordArray *y)
 }
 
 /**
-* Выполняет умножение многочленов, степень которых больше 32 и меньше 64.
+* Виконує множення многочленів, степінь яких більше 32 і менше 64.
 *
 * @param x многочлен 1
 * @param y многочлен 2
-* @param r буфер для произведения многочленов
+* @param r буфер для добутку многочленів
 */
 static void gf2m_mul_64(const word_t *x, const word_t *y, word_t *r)
 {
@@ -712,12 +712,12 @@ static void gf2m_mul_64(const word_t *x, const word_t *y, word_t *r)
 }
 
 /**
-* Выполняет умножение многочленов, степень которых больше 64 и меньше 128.
+* Виконує множення многочленів, степінь яких більше 64 і менше 128.
 *
 * @param x многочлен 1
 * @param y многочлен 2
-* @param len длина многочленов в словах
-* @param z буфер для произведения многочленов
+* @param len довжина многочленів в словах
+* @param z буфер для добутку многочленів
 */
 static void gf2m_mul_128(const word_t *x, const word_t *y, int len, word_t *z)
 {
@@ -868,7 +868,7 @@ void gf2m_mul_opt(const Gf2mCtx *ctx, const WordArray *x1, const WordArray *y1, 
     wa_swap(x1, x);
     wa_swap(y1, y);
 
-    /* Степень полинома, порождающего полиномиальный базис меньше 257. */
+    /* Степінь поліному, що породжує поліноміальный базис менше 257. */
     if (n <= WA_LEN(32)) {
         gf2m_mul_256(x->buf, y->buf, n, true, r->buf);
         wa_swap(r, r1);
@@ -876,7 +876,7 @@ void gf2m_mul_opt(const Gf2mCtx *ctx, const WordArray *x1, const WordArray *y1, 
         goto cleanup;
     }
 
-    /* Степень полинома, порождающего полиномиальный базис равна 257. */
+    /* Степінь полиному, що породжує поліноміальный базис рівно 257. */
     if (ctx->f[0] == 257) {
 
         r->buf[0] = 0;
@@ -902,7 +902,7 @@ void gf2m_mul_opt(const Gf2mCtx *ctx, const WordArray *x1, const WordArray *y1, 
     }
 
     /*
-     * Степень полинома больше 257. Многочлены x и y представляются в виде:
+     * Степінь поліному більше 257. Многочлени x і y представлені у вигляді:
      * x(t) = x0(t) * t^256 + x1(t),
      * y(t) = y0(t) * t^256 + y1(t)
      */
@@ -1092,11 +1092,11 @@ cleanup:
 }
 
 /**
- * Вычисляет полуслед элемента поля GF(2^m).
+ * Обчислює напівслід елементу поля GF(2^m).
  *
  * @param ctx параметри GF(2^m)
- * @param a элемент поля
- * @param htrace полуслед размера n
+ * @param a елемент поля
+ * @param htrace напівслід разміру n
  */
 static void gf2m_mod_htrace(const Gf2mCtx *ctx, const WordArray *a, WordArray *htrace)
 {

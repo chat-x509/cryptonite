@@ -33,7 +33,7 @@ static int public_key_to_ec_point(Dstu4145ParamsCtx *params, const ByteArray *qx
     wa_change_len(x, params->ec2m->len);
     wa_change_len(y, params->ec2m->len);
 
-    /* Координаты точки принадлежат основному полю. */
+    /* Координати точки що належить основному полю. */
     if (int_bit_len(x) > params->m) {
         SET_ERROR(RET_INVALID_PUBLIC_KEY);
     }
@@ -142,7 +142,7 @@ static Dstu4145ParamsCtx *dstu4145_params_alloc(const int *f, size_t f_len, int 
     if (is_onb) {
         init_onb_params(params, f[0]);
 
-        /* b принадлежит GF(2^m). */
+        /* b належить GF(2^m). */
         if (int_bit_len(params->ec2m->b) > params->m) {
             SET_ERROR(RET_INVALID_DSTU_PARAM_B);
         }
@@ -152,7 +152,7 @@ static Dstu4145ParamsCtx *dstu4145_params_alloc(const int *f, size_t f_len, int 
         params->to_onb = NULL;
     }
 
-    /* Инициализация базовой точки. */
+    /* Ініціалізація базової точки. */
     if (py == NULL) {
         DO(dstu4145_decompress_pubkey_core(params, px, &qx, &qy));
         CHECK_NOT_NULL(px_wa = wa_alloc_from_ba(qx));
@@ -590,7 +590,7 @@ int dstu4145_generate_privkey(const Dstu4145Ctx *ctx, PrngCtx *prng, ByteArray *
 
     CHECK_NOT_NULL(*d = ba_alloc_by_len((n_bit_len + 7) / 8));
 
-    /* Генерация закрытого ключа. */
+    /* Генерація закритого ключа. */
     do {
         DO(prng_next_bytes(prng, *d));
         DO(ba_truncate(*d, n_bit_len - 1));
@@ -662,7 +662,7 @@ int dstu4145_get_pubkey(const Dstu4145Ctx *ctx, const ByteArray *d, ByteArray **
 
     wa_change_len(d_wa, ctx->params->ec2m->len);
 
-    /* Получение открытого ключа. */
+    /* Отримання відкритого ключа. */
     CHECK_NOT_NULL(Q = ec_point_alloc(params->ec2m->len));
     if (ctx->params->precomp_p == NULL) {
         int sign_win_opt_level = (default_opt_level >> 8) & 0x0f;
@@ -674,7 +674,7 @@ int dstu4145_get_pubkey(const Dstu4145Ctx *ctx, const ByteArray *d, ByteArray **
     }
     DO(ec2m_dual_mul_opt(params->ec2m, params->precomp_p, d_wa, NULL, NULL, Q));
 
-    /* Инвертируем точку эллиптической кривой. */
+    /* Інвертуємо точку еліптичної кривої. */
     gf2m_mod_add(Q->x, Q->y, Q->y);
 
     if (params->is_onb) {
@@ -794,7 +794,7 @@ int dstu4145_init_sign(Dstu4145Ctx *ctx, const ByteArray *d, PrngCtx *prng)
         SET_ERROR(RET_INVALID_PRIVATE_KEY);
     }
 
-    /* 0 < d < n, хотя для ключей ДСТУ 4145-2002: L(d) < L(n), используется более слабое ограничение d < n, для ключей по ISO 15946-3. */
+    /* 0 < d < n, хоча для ключів ДСТУ 4145-2002: L(d) < L(n), використовується більш слабке обмеження d < n, для ключів по ISO 15946-3. */
     if (int_cmp(ctx->priv_key, ctx->params->n) >= 0) {
         SET_ERROR(RET_INVALID_PRIVATE_KEY);
     }
@@ -993,7 +993,7 @@ int dstu4145_init_verify(Dstu4145Ctx *ctx, const ByteArray *qx, const ByteArray 
         ctx->prng = NULL;
     }
 
-    /* Установка открытого ключа. */
+    /* Встановлення відкритого ключа. */
     DO(public_key_to_ec_point(ctx->params, qx, qy, &pub_key));
     if (ctx->pub_key != NULL) {
         if (wa_cmp(pub_key->x, ctx->pub_key->x) != 0 || wa_cmp(pub_key->y, ctx->pub_key->y) != 0
@@ -1077,7 +1077,7 @@ int dstu4145_verify(const Dstu4145Ctx *ctx, const ByteArray *hash, const ByteArr
 
     ec2m = params->ec2m;
 
-    /* Проверка ЭЦП. */
+    /* Перевірка КЕП. */
     n_bit_len = int_bit_len(ctx->params->n);
 
     if (((ba_get_len(s) + ba_get_len(r)) & 1) == 1) {
@@ -1087,7 +1087,7 @@ int dstu4145_verify(const Dstu4145Ctx *ctx, const ByteArray *hash, const ByteArr
     CHECK_NOT_NULL(wr = wa_alloc_from_ba(r));
     CHECK_NOT_NULL(ws = wa_alloc_from_ba(s));
 
-    /* 0 < wr < n і 0 < ws < n, иначе подпись неверная. */
+    /* 0 < wr < n і 0 < ws < n, інакше підпис невалідний. */
     if ((int_cmp(wr, ctx->params->n) >= 0) || (int_cmp(ws, ctx->params->n) >= 0)
             || int_is_zero(wr) || int_is_zero(ws)) {
         SET_ERROR(RET_VERIFY_FAILED);
@@ -1134,9 +1134,9 @@ cleanup:
 }
 
 /**
- * Возвращает кофактор.
+ * Повертає кофактор.
  *
- * @param ctx параметры ДСТУ 4145
+ * @param ctx параметри ДСТУ 4145
  * @param cofactor кофактор
  */
 static void dstu4145ec_get_cofactor(const Dstu4145ParamsCtx *params, WordArray *cofactor)
@@ -1194,21 +1194,21 @@ int dstu4145_dh(const Dstu4145Ctx *ctx, bool with_cofactor, const ByteArray *d, 
 
     len = ctx->params->ec2m->len;
 
-    /* Получение кофактора. */
+    /* Отримання кофактору. */
     CHECK_NOT_NULL(cofactor = wa_alloc(len));
     dstu4145ec_get_cofactor(ctx->params, cofactor);
 
-    /* Инициализация открытого ключа удаленной стороны. */
+    /* Ініціалізація відкритого ключа віддаленої сторони. */
     DO(public_key_to_ec_point(ctx->params, qx, qy, &rq));
 
-    /* Проверка того что открытый ключ лежит в подгруппе порядка n. */
+    /* Перевірка того, що відкритий ключ лежить в підгрупі порядку n. */
     CHECK_NOT_NULL(r = ec_point_alloc(len));
     ec2m_mul(ctx->params->ec2m, rq, cofactor, r);
     if (int_is_zero(r->x) && int_is_zero(r->y)) {
         SET_ERROR(RET_INVALID_PUBLIC_KEY);
     }
 
-    /* Проверка корректности закрытого ключа (0 < d < n). */
+    /* Перевірка коректності закритого ключа (0 < d < n). */
     CHECK_NOT_NULL(x = wa_alloc_from_ba(d));
     if (int_cmp(x, ctx->params->n) >= 0) {
         SET_ERROR(RET_INVALID_PRIVATE_KEY);
@@ -1216,7 +1216,7 @@ int dstu4145_dh(const Dstu4145Ctx *ctx, bool with_cofactor, const ByteArray *d, 
 
     wa_change_len(x, ctx->params->ec2m->len);
 
-    /* Получение общего секрета. */
+    /* Отримання спільного секрету ДСТУ 4145 */
     ec2m_mul(ctx->params->ec2m, rq, x, r);
 
     if (with_cofactor) {

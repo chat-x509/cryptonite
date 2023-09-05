@@ -23,14 +23,14 @@ typedef enum {
 typedef struct RipemdCtx_st RipemdCtx;
 
 /**
- * Выделение памяти для режиму RIPEMD128.
+ * Виділення памʼяті для режиму RIPEMD128.
  *
  * @return повертає указатель на выделенную память.
  */
 RipemdCtx *ripemd_alloc(RipemdVariant mode);
 
 /**
- * Удаление даних з контексту RIPEMD.
+ * Видалення даних з контексту RIPEMD.
  *
  * @param ctx контекст RIPEMD.
  */
@@ -40,13 +40,13 @@ void ripemd_free(RipemdCtx *ctx);
  * Добавление даних для геширования.
  *
  * @param ctx контекст RIPEMD.
- * @param data дані, які нужно загешировать.
- * @return  - 1 у случае успеха і код помилки у обратном.
+ * @param data дані, які потрібно загешувати.
+ * @return  - 1 у випадку успіху і код помилки в оберненому.
  */
 int ripemd_update(RipemdCtx *ctx, const ByteArray *data);
 
 /**
- * Получение гешавідданих.
+ * Отримання геша від даних.
  *
  * @param ctx контекст RIPEMD.
  * @param hash_code геш даних.
